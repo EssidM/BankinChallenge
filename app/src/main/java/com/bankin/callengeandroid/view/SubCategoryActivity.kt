@@ -1,7 +1,8 @@
-package com.bankin.callengeandroid
+package com.bankin.callengeandroid.view
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import com.bankin.callengeandroid.R
 
 class SubCategoryActivity : AppCompatActivity() {
 
