@@ -1,27 +1,29 @@
 package com.bankin.callengeandroid
 
 import android.app.Application
-import com.bankin.callengeandroid.api.ResourcesService
-import com.bankin.callengeandroid.di.component.DaggerNetworkComponent
-import com.bankin.callengeandroid.di.component.NetworkComponent
+import com.bankin.callengeandroid.di.component.CategoriesComponent
+import com.bankin.callengeandroid.di.component.DaggerCategoriesComponent
 import com.bankin.callengeandroid.di.module.AppModule
+import com.bankin.callengeandroid.di.module.CategoriesModule
 import com.bankin.callengeandroid.di.module.NetworkModule
 
 
 class BankinChallengeApp : Application() {
 
-    private lateinit var networkComponent: NetworkComponent
+    private lateinit var appComponent: CategoriesComponent
 
     override fun onCreate() {
         super.onCreate()
 
-        networkComponent = DaggerNetworkComponent.builder()
+        appComponent = DaggerCategoriesComponent.builder()
             .appModule(AppModule(this))
-            .networkModule(NetworkModule("https://raw.githubusercontent.com/bankin-engineering/challenge-android/master/categories.json"))
+            .networkModule(NetworkModule("https://raw.githubusercontent.com/bankin-engineering/challenge-android/master/"))
+            .categoriesModule(CategoriesModule())
             .build()
     }
 
-    fun getResourceService(): ResourcesService {
-        return networkComponent.resourcesService()
+
+    fun getCategories(): CategoriesComponent {
+        return appComponent
     }
 }

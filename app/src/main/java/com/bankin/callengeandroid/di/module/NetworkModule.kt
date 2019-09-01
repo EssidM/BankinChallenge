@@ -1,9 +1,6 @@
 package com.bankin.callengeandroid.di.module
 
 import android.app.Application
-import android.content.SharedPreferences
-import android.preference.PreferenceManager
-import com.bankin.callengeandroid.api.ResourcesService
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -19,12 +16,6 @@ import javax.inject.Singleton
 
 @Module
 class NetworkModule(private var mBaseUrl: String) {
-
-    @Provides
-    @Singleton
-    fun providesSharedPreferences(application: Application): SharedPreferences {
-        return PreferenceManager.getDefaultSharedPreferences(application)
-    }
 
     @Provides
     @Singleton
@@ -57,11 +48,5 @@ class NetworkModule(private var mBaseUrl: String) {
             .baseUrl(mBaseUrl)
             .client(okHttpClient)
             .build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideResourcesService(retrofit: Retrofit): ResourcesService {
-        return retrofit.create(ResourcesService::class.java)
     }
 }

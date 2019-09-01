@@ -7,6 +7,6 @@ import retrofit2.http.GET
 
 interface ResourcesService {
 
-    @GET
+    @GET("categories.json")
     fun getResources(): Single<Resources>
 }
