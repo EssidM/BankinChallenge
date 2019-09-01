@@ -10,7 +10,7 @@ class CategoriesMainViewModel @Inject constructor(private var categoryRepo: ICat
 
 
     fun getAllCategories() {
-        categoryRepo.fetchAllCategories().doOnNext {
+        categoryRepo.fetchPrimaryCategories().doOnNext {
 
             Log.d(TAG, "categories fetched $it")
         }.doOnError {
