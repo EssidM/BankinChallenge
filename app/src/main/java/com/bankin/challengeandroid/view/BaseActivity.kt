@@ -19,12 +19,16 @@ abstract class BaseActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_base)
-
+        parseArguments(intent.extras)
     }
 
     fun bindFragment(toBind: Fragment) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.activity_content, toBind)
             .commit()
+    }
+
+    protected open fun parseArguments(args: Bundle?) {
+        // no-op
     }
 }

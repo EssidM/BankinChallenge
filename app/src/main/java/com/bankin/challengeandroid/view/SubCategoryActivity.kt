@@ -1,13 +1,22 @@
 package com.bankin.challengeandroid.view
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import com.bankin.callengeandroid.R
+import com.bankin.challengeandroid.Arguments
 
-class SubCategoryActivity : AppCompatActivity() {
+class SubCategoryActivity : BaseActivity() {
+
+     var id : Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_sub_category)
+
+        bindFragment(CategoriesListFragment.newInstance(id))
+    }
+
+    override fun parseArguments(args: Bundle?) {
+        super.parseArguments(args)
+
+        id = args?.getLong(Arguments.PARENT_CATEGORY_ID) ?: 0
     }
 }

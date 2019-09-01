@@ -20,7 +20,7 @@ class CategoriesRepository @Inject constructor(private val categoriesService: Ca
         }
     }
 
-    override fun fetchCategoriesByParent(parent: String): Observable<List<Resource>> {
+    override fun fetchSubCategories(id: Long): Observable<List<Resource>> {
         return fetchCategories().map { result ->
 
             Log.d(TAG, "results : ${result.resources}")
@@ -29,12 +29,7 @@ class CategoriesRepository @Inject constructor(private val categoriesService: Ca
             val categories = result.resources ?: ArrayList()
 
             // filter on parent if defined
-            if (parent.isNotEmpty()) {
-                return@map categories.filter { parent.equals(it.parent) }
-            }
-
-            // return original list
-            return@map categories
+            return@map categories.filter { id.equals(it.parent?.id) }
         }
     }
 

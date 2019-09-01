@@ -7,7 +7,7 @@ class MainCategoryActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        bindFragment(CatgeoriesListFragment())
+        bindFragment(CategoriesListFragment.newInstance())
     }
 
 }

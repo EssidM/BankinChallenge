@@ -8,5 +8,5 @@ interface ICategoriesRepository {
 
     fun fetchMainCategories(): Observable<List<Resource>>
 
-    fun fetchCategoriesByParent(parent: String = ""): Observable<List<Resource>>
+    fun fetchSubCategories(id: Long): Observable<List<Resource>>
 }
