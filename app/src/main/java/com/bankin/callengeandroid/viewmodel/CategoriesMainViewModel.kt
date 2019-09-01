@@ -18,6 +18,12 @@ class CategoriesMainViewModel @Inject constructor(private var categoryRepo: ICat
         }.subscribe()
     }
 
+    fun getSubcategories(parent: String) {
+        categoryRepo.fetchCategoriesByParent(parent).doOnNext {
+            Log.d(TAG, "categories fetched $it")
+        }
+    }
+
     companion object {
         const val TAG = "CategoriesMainViewModel"
     }

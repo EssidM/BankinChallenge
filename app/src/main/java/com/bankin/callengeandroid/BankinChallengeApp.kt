@@ -23,7 +23,7 @@ class BankinChallengeApp : Application() {
     }
 
 
-    fun getCategories(): CategoriesComponent {
+    fun getCategoriesComponent(): CategoriesComponent {
         return appComponent
     }
 }

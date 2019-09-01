@@ -1,6 +1,6 @@
 package com.bankin.callengeandroid.di.module
 
-import com.bankin.callengeandroid.api.ResourcesService
+import com.bankin.callengeandroid.api.CategoriesService
 import com.bankin.callengeandroid.repository.ICategoriesRepository
 import com.bankin.callengeandroid.repository.impl.CategoriesRepository
 import dagger.Module
@@ -12,12 +12,12 @@ import retrofit2.Retrofit
 class CategoriesModule {
 
     @Provides
-    fun provideResourcesService(retrofit: Retrofit): ResourcesService {
-        return retrofit.create(ResourcesService::class.java)
+    fun provideResourcesService(retrofit: Retrofit): CategoriesService {
+        return retrofit.create(CategoriesService::class.java)
     }
 
     @Provides
-    fun provideCategoryRepository(resourcesService: ResourcesService): ICategoriesRepository {
-        return CategoriesRepository(resourcesService)
+    fun provideCategoryRepository(categoriesService: CategoriesService): ICategoriesRepository {
+        return CategoriesRepository(categoriesService)
     }
 }

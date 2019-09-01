@@ -3,11 +3,12 @@ package com.bankin.callengeandroid.model
 import com.google.gson.annotations.Expose
 
 // todo convert to data class
-class Resources {
+class Categories {
 
     @Expose
     var pagination: Pagination? = null
+
     @Expose
-    var items: List<Resource>? = null
+    var resources: List<Resource>? = null
 
 }
