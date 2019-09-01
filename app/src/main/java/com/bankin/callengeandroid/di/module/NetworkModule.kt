@@ -3,6 +3,7 @@ package com.bankin.callengeandroid.di.module
 import android.app.Application
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
+import com.bankin.callengeandroid.api.ResourcesService
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -21,13 +22,13 @@ class NetworkModule(private var mBaseUrl: String) {
 
     @Provides
     @Singleton
-    internal fun providesSharedPreferences(application: Application): SharedPreferences {
+    fun providesSharedPreferences(application: Application): SharedPreferences {
         return PreferenceManager.getDefaultSharedPreferences(application)
     }
 
     @Provides
     @Singleton
-    internal fun provideGson(): Gson {
+    fun provideGson(): Gson {
         val gsonBuilder = GsonBuilder()
         gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
         return gsonBuilder.create()
@@ -35,13 +36,13 @@ class NetworkModule(private var mBaseUrl: String) {
 
     @Provides
     @Singleton
-    internal fun provideCache(application: Application): Cache {
+    fun provideCache(application: Application): Cache {
         return Cache(application.cacheDir, (10 * 1024 * 1024).toLong())
     }
 
     @Provides
     @Singleton
-    internal fun provideOkhttpClient(cache: Cache): OkHttpClient {
+    fun provideOkhttpClient(cache: Cache): OkHttpClient {
         val client = OkHttpClient.Builder()
         client.cache(cache)
         return client.build()
@@ -49,12 +50,18 @@ class NetworkModule(private var mBaseUrl: String) {
 
     @Provides
     @Singleton
-    internal fun provideRetrofit(gson: Gson, okHttpClient: OkHttpClient): Retrofit {
+    fun provideRetrofit(gson: Gson, okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create(gson))
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .baseUrl(mBaseUrl)
             .client(okHttpClient)
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideResourcesService(retrofit: Retrofit): ResourcesService {
+        return retrofit.create(ResourcesService::class.java)
     }
 }

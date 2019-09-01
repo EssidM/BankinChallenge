@@ -1,6 +1,6 @@
 package com.bankin.callengeandroid.repository.impl
 
-import com.bankin.callengeandroid.api.ResourceService
+import com.bankin.callengeandroid.api.ResourcesService
 import com.bankin.callengeandroid.model.Resource
 import com.bankin.callengeandroid.repository.ICategoriesRepository
 import io.reactivex.Observable
@@ -8,7 +8,7 @@ import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 
-class CategoriesRepository @Inject constructor(private val resourceService: ResourceService) :
+class CategoriesRepository @Inject constructor(private val resourcesService: ResourcesService) :
     ICategoriesRepository {
 
 
@@ -17,7 +17,7 @@ class CategoriesRepository @Inject constructor(private val resourceService: Reso
     }
 
     override fun fetchCategoriesByParent(parent: String): Observable<List<Resource>> {
-        return resourceService.getResources()
+        return resourcesService.getResources()
             .subscribeOn(Schedulers.io())
             .map { result ->
                 // return category items or empty list
