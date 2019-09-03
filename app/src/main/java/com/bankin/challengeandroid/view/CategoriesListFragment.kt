@@ -1,6 +1,7 @@
 package com.bankin.challengeandroid.view
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
@@ -28,6 +29,14 @@ class CategoriesListFragment : BaseFragment() {
     var id: Long? = null
 
     val disposables = CompositeDisposable()
+
+    // on category selected callback
+
+    private val onCategorySelectedCallback: (parent: Long) -> Unit = {
+        val intent = Intent(context, SubCategoryActivity::class.java)
+        intent.putExtra(Arguments.PARENT_CATEGORY_ID, it)
+            startActivity(intent)
+    }
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
@@ -60,7 +69,11 @@ class CategoriesListFragment : BaseFragment() {
 
     fun bindCategoriesList(items: List<CategoryViewModel>, openableCategories: Boolean) {
         if (!::adapter.isInitialized) {
-            adapter = com.bankin.challengeandroid.adapter.CategoriesAdapter(items, openableCategories)
+            adapter = com.bankin.challengeandroid.adapter.CategoriesAdapter(
+                items,
+                openableCategories,
+                onCategorySelectedCallback
+            )
             categoriesRecycler.adapter = adapter
         } else {
             adapter.setItems(items)

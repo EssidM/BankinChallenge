@@ -1,21 +1,19 @@
 package com.bankin.challengeandroid.adapter
 
-import android.content.Intent
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.bankin.callengeandroid.R
-import com.bankin.challengeandroid.Arguments
-import com.bankin.challengeandroid.view.SubCategoryActivity
 import com.bankin.challengeandroid.viewmodel.CategoryViewModel
 
 
-/**
- * @author messid on 2019-09-01.
- */
-class CategoriesAdapter(private var items: List<CategoryViewModel>, val openableCategories: Boolean) :
+class CategoriesAdapter(
+    private var items: List<CategoryViewModel>,
+    private val openableCategories: Boolean,
+    private val onCategorySelectedCallback: (Long) -> Unit
+) :
     RecyclerView.Adapter<CategoriesAdapter.CategoryItemViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): CategoryItemViewHolder {
@@ -31,34 +29,31 @@ class CategoriesAdapter(private var items: List<CategoryViewModel>, val openable
         viewHolder: CategoryItemViewHolder,
         position: Int
     ) {
-        viewHolder.bind(items[position])
+        viewHolder.bind(items[position], onCategorySelectedCallback)
     }
 
     fun setItems(items: List<CategoryViewModel>) {
         this.items = items
         notifyDataSetChanged()
+
     }
 
-    class CategoryItemViewHolder(itemView: View, val openableCategories: Boolean) : RecyclerView.ViewHolder(itemView) {
+    class CategoryItemViewHolder(itemView: View, private val openableCategories: Boolean) : RecyclerView.ViewHolder(itemView) {
 
-        var title: TextView = itemView.findViewById(R.id.categoryItemTitle)
+        private var title: TextView = itemView.findViewById(R.id.categoryItemTitle)
 
-        fun bind(category: CategoryViewModel) {
+        fun bind(
+            category: CategoryViewModel,
+            onCategorySelectedCallback: (Long) -> Unit
+        ) {
             title.text = category.title
 
             itemView.setOnClickListener {
 
                 if (openableCategories) {
-                    openSubcategories(category.id)
+                    // call on category selected callback with parent id
+                    category.id?.let { onCategorySelectedCallback(it) }
                 }
-            }
-        }
-
-        private fun openSubcategories(parent: Long?) {
-            parent?.let {
-                val intent = Intent(itemView.context, SubCategoryActivity::class.java)
-                intent.putExtra(Arguments.PARENT_CATEGORY_ID, it)
-                itemView.context.startActivity(intent)
             }
         }
     }
