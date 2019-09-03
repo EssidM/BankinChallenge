@@ -11,14 +11,13 @@ import com.bankin.challengeandroid.viewmodel.CategoryViewModel
 
 class CategoriesAdapter(
     private var items: List<CategoryViewModel>,
-    private val openableCategories: Boolean,
-    private val onCategorySelectedCallback: (Long) -> Unit
+    private val onCategorySelectedCallback: (Long, String) -> Unit
 ) :
     RecyclerView.Adapter<CategoriesAdapter.CategoryItemViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, position: Int): CategoryItemViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_category, parent, false)
-        return CategoryItemViewHolder(view, openableCategories)
+        return CategoryItemViewHolder(view)
     }
 
     override fun getItemCount(): Int {
@@ -38,24 +37,20 @@ class CategoriesAdapter(
 
     }
 
-    class CategoryItemViewHolder(itemView: View, private val openableCategories: Boolean) : RecyclerView.ViewHolder(itemView) {
+    class CategoryItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         private var title: TextView = itemView.findViewById(R.id.categoryItemTitle)
 
         fun bind(
             category: CategoryViewModel,
-            onCategorySelectedCallback: (Long) -> Unit
+            onCategorySelectedCallback: (Long, String) -> Unit
         ) {
             title.text = category.title
 
             itemView.setOnClickListener {
-
-                if (openableCategories) {
-                    // call on category selected callback with parent id
-                    category.id?.let { onCategorySelectedCallback(it) }
-                }
+                // call on category selected callback with parent id
+                category.id?.let { onCategorySelectedCallback(it, category.title) }
             }
         }
     }
-
 }

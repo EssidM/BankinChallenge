@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_marginStart="@dimen/spacing"
-             android:layout_marginEnd="@dimen/spacing"
-             android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginStart="@dimen/spacing"
+    android:layout_marginEnd="@dimen/spacing">
 
+
+    <TextView
+        android:id="@+id/emptyCategoriesPlaceHolder"
+        style="@style/no_categories_place_holder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="@string/no_categories" />
 
     <android.support.v7.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:id="@+id/categoriesRecycler"
-            android:layout_height="match_parent"/>
+        android:id="@+id/categoriesRecycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </FrameLayout>

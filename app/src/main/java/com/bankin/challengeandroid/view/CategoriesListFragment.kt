@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.bankin.callengeandroid.R
 import com.bankin.challengeandroid.Arguments
+import com.bankin.challengeandroid.adapter.CategoriesAdapter
 import com.bankin.challengeandroid.viewmodel.CategoriesMainViewModel
 import com.bankin.challengeandroid.viewmodel.CategoryViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -24,18 +25,19 @@ class CategoriesListFragment : BaseFragment() {
     @Inject
     lateinit var categoriesMainViewModel: CategoriesMainViewModel
 
-    lateinit var adapter: com.bankin.challengeandroid.adapter.CategoriesAdapter
+    private lateinit var adapter: CategoriesAdapter
 
-    var id: Long? = null
+    private var id: Long? = null
 
-    val disposables = CompositeDisposable()
+    private val disposables = CompositeDisposable()
+
 
     // on category selected callback
-
-    private val onCategorySelectedCallback: (parent: Long) -> Unit = {
+    private val onCategorySelectedCallback: (Long, String) -> Unit = { id, name ->
         val intent = Intent(context, SubCategoryActivity::class.java)
-        intent.putExtra(Arguments.PARENT_CATEGORY_ID, it)
-            startActivity(intent)
+        intent.putExtra(Arguments.PARENT_CATEGORY_ID, id)
+        intent.putExtra(Arguments.PARENT_CATEGORY_NAME, name)
+        startActivity(intent)
     }
 
     override fun onAttach(context: Context?) {
@@ -52,13 +54,28 @@ class CategoriesListFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         categoriesRecycler.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        val disposable = id?.let {
-            fetchSubCategories(it)
+
+        // fetch subcategories if id of parent is defined
+        id?.let {
+            categoriesMainViewModel.getSubcategories(it)
         } ?: kotlin.run {
-            fetchMainCategories()
+            // fetch main categories
+            categoriesMainViewModel.getMainCategories()
         }
 
-        disposables.add(disposable)
+        val disposable = categoriesMainViewModel.categoriesSubject
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext {
+                    if (it.isEmpty()) {
+                        emptyCategoriesPlaceHolder.visibility = View.VISIBLE
+                    } else {
+                        emptyCategoriesPlaceHolder.visibility = View.GONE
+                        bindCategoriesList(it)
+                    }
+                }
+                .subscribe()
+
+        disposables.addAll(disposable)
     }
 
     override fun parseArguments(args: Bundle?) {
@@ -67,12 +84,11 @@ class CategoriesListFragment : BaseFragment() {
         id = args?.getLong(Arguments.PARENT_CATEGORY_ID)
     }
 
-    fun bindCategoriesList(items: List<CategoryViewModel>, openableCategories: Boolean) {
+    private fun bindCategoriesList(items: List<CategoryViewModel>) {
         if (!::adapter.isInitialized) {
-            adapter = com.bankin.challengeandroid.adapter.CategoriesAdapter(
-                items,
-                openableCategories,
-                onCategorySelectedCallback
+            adapter = CategoriesAdapter(
+                    items,
+                    onCategorySelectedCallback
             )
             categoriesRecycler.adapter = adapter
         } else {
@@ -80,30 +96,16 @@ class CategoriesListFragment : BaseFragment() {
         }
     }
 
-    fun fetchMainCategories(): Disposable {
-        return categoriesMainViewModel.getMainCategories()
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnNext {
-                bindCategoriesList(it, true)
-            }.doOnError {
-                Toast.makeText(context, "fetch error : ${it.message}", Toast.LENGTH_SHORT).show()
-            }.subscribe()
-    }
-
-    fun fetchSubCategories(id: Long): Disposable {
-        return categoriesMainViewModel.getSubcategories(id)
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnNext {
-                bindCategoriesList(it, false)
-            }.doOnError {
-                Toast.makeText(context, "fetch error : ${it.message}", Toast.LENGTH_SHORT).show()
-            }.subscribe()
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
 
         disposables.dispose()
+    }
+
+    private fun openSubcategories(id: Long) {
+        val intent = Intent(context, SubCategoryActivity::class.java)
+        intent.putExtra(Arguments.PARENT_CATEGORY_ID, id)
+        context?.startActivity(intent)
     }
 
     companion object {
