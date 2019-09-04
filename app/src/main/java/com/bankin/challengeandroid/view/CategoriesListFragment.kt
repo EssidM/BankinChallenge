@@ -1,5 +1,6 @@
 package com.bankin.challengeandroid.view
 
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -7,15 +8,16 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import com.bankin.callengeandroid.R
 import com.bankin.challengeandroid.Arguments
+import com.bankin.challengeandroid.BankinChallengeApp
 import com.bankin.challengeandroid.adapter.CategoriesAdapter
+import com.bankin.challengeandroid.repository.impl.CategoriesRepository
+import com.bankin.challengeandroid.viewmodel.BaseViewModelFactory
 import com.bankin.challengeandroid.viewmodel.CategoriesMainViewModel
 import com.bankin.challengeandroid.viewmodel.CategoryViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_categories_list.*
 import javax.inject.Inject
 
@@ -23,8 +25,8 @@ import javax.inject.Inject
 class CategoriesListFragment : BaseFragment() {
 
     @Inject
+    lateinit var categoriesRepository: CategoriesRepository
     lateinit var categoriesMainViewModel: CategoriesMainViewModel
-
     private lateinit var adapter: CategoriesAdapter
 
     private var id: Long? = null
@@ -34,16 +36,22 @@ class CategoriesListFragment : BaseFragment() {
 
     // on category selected callback
     private val onCategorySelectedCallback: (Long, String) -> Unit = { id, name ->
-        val intent = Intent(context, SubCategoryActivity::class.java)
-        intent.putExtra(Arguments.PARENT_CATEGORY_ID, id)
-        intent.putExtra(Arguments.PARENT_CATEGORY_NAME, name)
-        startActivity(intent)
+        openSubcategories(id, name)
     }
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
 
-        (activity?.application as com.bankin.challengeandroid.BankinChallengeApp).getCategoriesComponent().inject(this)
+        (activity?.application as BankinChallengeApp).getCategoriesComponent().inject(this)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        categoriesMainViewModel =
+            ViewModelProviders.of(this, BaseViewModelFactory { CategoriesMainViewModel(categoriesRepository) })
+                .get(CategoriesMainViewModel::class.java)
+
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -64,16 +72,16 @@ class CategoriesListFragment : BaseFragment() {
         }
 
         val disposable = categoriesMainViewModel.categoriesSubject
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext {
-                    if (it.isEmpty()) {
-                        emptyCategoriesPlaceHolder.visibility = View.VISIBLE
-                    } else {
-                        emptyCategoriesPlaceHolder.visibility = View.GONE
-                        bindCategoriesList(it)
-                    }
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext {
+                if (it.isEmpty()) {
+                    emptyCategoriesPlaceHolder.visibility = View.VISIBLE
+                } else {
+                    emptyCategoriesPlaceHolder.visibility = View.GONE
+                    bindCategoriesList(it)
                 }
-                .subscribe()
+            }
+            .subscribe()
 
         disposables.addAll(disposable)
     }
@@ -87,8 +95,8 @@ class CategoriesListFragment : BaseFragment() {
     private fun bindCategoriesList(items: List<CategoryViewModel>) {
         if (!::adapter.isInitialized) {
             adapter = CategoriesAdapter(
-                    items,
-                    onCategorySelectedCallback
+                items,
+                onCategorySelectedCallback
             )
             categoriesRecycler.adapter = adapter
         } else {
@@ -102,10 +110,11 @@ class CategoriesListFragment : BaseFragment() {
         disposables.dispose()
     }
 
-    private fun openSubcategories(id: Long) {
+    private fun openSubcategories(id: Long, name: String) {
         val intent = Intent(context, SubCategoryActivity::class.java)
         intent.putExtra(Arguments.PARENT_CATEGORY_ID, id)
-        context?.startActivity(intent)
+        intent.putExtra(Arguments.PARENT_CATEGORY_NAME, name)
+        startActivity(intent)
     }
 
     companion object {
